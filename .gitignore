@@ -1,0 +1,18 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+**/tmp/
+**/IGNORED/
+**/figs/
+**/data/
+**/results/
+
+
+# knitr and R markdown default cache directories
+**/*_cache/
+**/cache/
+**/docs/*.nb.html
+*.html
+*.md

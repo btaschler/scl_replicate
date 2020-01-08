@@ -1,0 +1,336 @@
+---
+title: "SCL/CAD replication"
+author: "BT"
+date: '`r format(Sys.Date())`'
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    keep_md: yes
+    theme: united
+    toc: yes
+    toc_float: yes
+params:
+  tmp: 0
+---
+
+
+## Dependencies
+- `MASS`
+- `pcalg`
+- `biglasso`
+- `huge`
+- `corpcor`
+- `nem`
+- `matrixStats`
+- `irlba`
+- `rsvd`
+- `MLmetrics`
+- `ROCR`
+- `parallel`
+- `doParallel`
+- `itertools`
+- `BiocManager`
+- `filehash`
+- `R.utils`
+- `R.devices`
+- `tidyverse`
+- `colorspace`
+
+
+```{r setup, include=FALSE}
+options(width = 888)  #disable when output document is pdf to keep within margins
+knitr::opts_chunk$set(fig.path = "figs/scl_rep_",
+                      echo = TRUE, results = "show", fig.width = 11)
+
+## external dependencies
+lapply(c('MASS', 'pcalg', 'biglasso', 'huge', 'corpcor', 'nem',
+         'matrixStats', 'irlba', 'rsvd', 'MLmetrics', 'ROCR', 
+         'parallel', 'doParallel', 'itertools',
+         'BiocManager', 'filehash', 'R.utils', 'R.devices', 'tidyverse', 
+         'colorspace'),
+       require, character.only = TRUE)
+
+## load functions
+R.utils::sourceDirectory('R')
+R.utils::sourceDirectory('experiments/functions')
+R.utils::sourceDirectory('experiments/methods')
+source('lv-ida-master/iscyclic.R')
+source('lv-ida-master/lvida.R')
+```
+
+```{r session_info, eval=FALSE}
+sessionInfo()
+```
+
+
+## Overview
+
+The goal of this document and code is to (externally) reproduce/replicate the original results in the Noé et al. paper (<https://arxiv.org/abs/1905.11506>).
+
+The code is a slightly modified and trimmed down version of the original (for the full paper version, see Github repo: <https://github.com/unoe/cad>). None of the pre- or post-processing steps have been changed. Some function calls have been simplified for better interactability and the overall workflow for a subset of the original experiments has been condensed into this markdown document. File, function and variable names have (largely) been kept as in the original for comparability. 
+
+
+
+
+## Data
+
+The data structure `data_list` contains all available data points as extracted from the original (raw) csv data files. 
+
+**Requirement**: File `shrna_processed_data.rds` needs to be stored in the "data" folder inside the working directory.
+
+```{r load_data, include=TRUE, cache=TRUE, message=FALSE}
+#cat('\n load preprocessed shRNA-seq data ... \n') 
+fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds')
+data_list <- readRDS(fid_data)
+```
+
+
+&nbsp;
+
+----
+
+## Experiment - varying p
+
+```{r setup_output, include=TRUE}
+if(!dir.exists('results')){ dir.create('results') }
+```
+
+**Note**: The following `experiments_*.R` scripts are wrappers for the actual function calls. They also specify certain parameter settings, i.e. the number of repetitions (different subsamples) per setting, the dimensionality $p$ (from 25 to max  of about 19000 -- *Warning: most methods scale super-exponentially with $p$ and are infeasible to run beyond $p\approx 1000$*). 
+
+The first part in some of these scripts is also used to generate the data matrices for each specified parameter setting. The data files are automatically stored in the "data" folder. In principle, this has only to be run once to create the input data for any method call. 
+
+Individual results (for each method, setting and repetition) are stored as separate files in the "results" folder. The plotting script then processes the whole directory at the end to combine the results. 
+
+
+**Default settings**: As defaults, I've set the number of subsampled data sets (i.e. "repetitions") to $3$ and restricted the dimensionality to $p = [50, 100]$. In the end, the aim for a full replication of the original results would be 10 repetions and $p$ up to 1000.
+
+
+&nbsp;
+
+### Running the original CAD/SCL code
+```{r cad_vary_p, include=TRUE, cache=TRUE, message=FALSE, dependson='load_data'}
+#source('experiments/experiments_vary_p_NEW.R')
+```
+
+**Note**: This will take a long time to run for any $p > 200$. Since we are mainly interested in the other methods, this can be skipped. 
+
+
+### Running the original GIES code
+```{r gies_vary_p, include=TRUE, cache=TRUE, message=FALSE, dependson='load_data'}
+source('experiments/experiments_vary_p_gies.R')
+```
+
+**To change the GIES function call:**  
+
+Please modify the function in `run_gies.R` (located in the "R" subfolder in the main directory). 
+
+
+
+### Running the original IDA and PC code
+```{r rfci_pc_vary_p, include=TRUE, cache=TRUE, message=FALSE, dependson='load_data'}
+source('experiments/experiments_vary_p_LITERATURE.R')
+```
+
+**To change the IDA and PC function calls:**  
+
+Please modify the functions `run_ida.R` and `run_pc.R`, respectively (located in the "R" subfolder in the main directory).
+
+
+
+### Running the original LV-IDA/RFCI code
+```{r ida_vary_p, include=TRUE, cache=TRUE, message=FALSE}
+source('experiments/experiments_vary_p_LVIDA.R')
+```
+
+**To change the LV-IDA/RFCI function call:**  
+
+Please modify the function in `run_lvida.R` (located in the "R" subfolder in the main directory).
+
+&nbsp;
+
+----
+
+## Results
+
+Below are shown some example results for the test settings. 
+
+**Note**: These function calls should also work for any other preliminary, partial or full results. All the files in the "results" folder are automatically taken into account when generating the figures. 
+
+```{r setup_plotting, include=FALSE, cache=FALSE}
+source('experiments/plotting/plottingFunctions.R')
+
+## The following bits of code are based on the file 'experiments/plotting/new_PLOTTING_VARY_P.R'.
+
+dict_auc_obj = list(method_cad_lasso = "g_hat",
+                    method_cor_kendall = "g_hat", 
+                    method_cor_pearson = "g_hat",
+                    method_cor_spearman = "g_hat",
+                    method_gies = "tc_strict",
+                    method_glasso = "g_hat",
+                    method_ida = "g_hat",
+                    method_pc = "tc_strict",
+                    method_pc_05 = "tc_strict",
+                    method_rfci = "g_hat_strict",
+                    method_shrinkage = "g_hat",
+                    method_cad_keras = "g_hat",
+                    method_lvida = "g_hat",
+                    method_lvida_05 = "g_hat")
+
+
+db_res_path = file.path(getwd(), "results", "vary_p")
+db_res = dbInit(db_res_path, type = "RDS")
+
+names = dbList(db_res)
+n = length(names)
+
+tbl = tibble(
+    p = NA, 
+    rep = NA, 
+    mask = NA, 
+    method = NA, 
+    time = NA
+)
+
+shared_variables = names(tbl)
+
+for (i in 1:n) {
+    res = db_res[[ names[i] ]]
+    
+    for (n in shared_variables) {
+        tbl[i, n] = res[[n]]
+    }
+
+    G_hat_type = dict_auc_obj[[ res$method ]]
+    
+    auc_obj = get_auc(res$G_star, 
+                      res$G0, 
+                      res[[ G_hat_type ]],
+                      res$method)
+    
+    tbl[i, 'auc'] = auc_obj$auc
+    tbl[i, 'tpr'] = auc_obj$tpr
+    tbl[i, 'fpr'] = auc_obj$fpr
+    tbl[i, 'y_true'] = list( list(auc_obj$y_true) )
+    tbl[i, 'y_pred'] = list( list(auc_obj$y_pred) )
+}
+
+
+tbl =
+    tbl %>%
+    mutate( method = str_remove(method, "method_") ) %>%
+    mutate( p = ifelse(p > 15000, 19000, p) ) %>%
+    filter( method != 'glasso', 
+            method != "cor_spearman",
+            method != "rfci") %>%
+    cad_name_mapping()
+
+
+n_rep = tbl$rep %>% unique %>% sort %>% length
+
+tbl_auc =
+    tbl %>%
+    filter(!(method %in% c('gies', 'rfci', 'pc'))) %>%
+    group_by(p, mask, method) %>%
+    summarise(avg_auc = mean(auc, na.rm = TRUE),
+              stderr_auc = sd(auc, na.rm = TRUE) / sqrt(n_rep),
+              avg_time = mean(time, na.rm = TRUE),
+              stderr_time = sd(time, na.rm = TRUE) / sqrt(n_rep)) %>%
+    cad_name_mapping()
+```
+
+&nbsp;
+
+### Entry-wise masking
+
+```{r plot_auc_entries, include=TRUE, echo=FALSE, fig.width=12, fig.height=10}
+ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'entries'), 
+       aes(x = p,
+           y = avg_auc,
+           ymin = avg_auc - stderr_auc,
+           ymax = avg_auc + stderr_auc,
+           color = Method,
+           shape = Method)) +
+    geom_line() +
+    geom_point(size = 3) +
+    geom_errorbar(width = 0.03) +
+    scale_color_manual(values = colorspace::qualitative_hcl(length(unique(tbl_auc$Method)), palette = "Dark 3")) +
+    scale_shape_manual(values = seq_along(tbl_auc$Method)) +
+    theme_light(base_size = 25) +
+    # facet_grid(. ~ mask, labeller = label_both) +
+    theme(legend.position = "right", legend.direction = "vertical") +
+    labs(y = "AUC", x = "p") +
+    ylim(c(0.2,1)) +
+    scale_x_log10(breaks = c(25, 50, 100, 500, 1000, 5000, 10000, 19000))
+```
+
+```{r plot_avg_roc_entries, include=TRUE, echo=FALSE, fig.width=10, fig.height=10}
+plot_average_roc(tbl, 100, 'entries')
+```
+
+&nbsp;
+
+### Row-wise masking
+
+```{r plot_auc_rows, include=TRUE, echo=FALSE, fig.width=12, fig.height=10}
+ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'rows'), 
+       aes(x = p,
+           y = avg_auc,
+           ymin = avg_auc - stderr_auc,
+           ymax = avg_auc + stderr_auc,
+           color = Method,
+           shape = Method)) +
+    geom_line() +
+    geom_point(size = 3) +
+    geom_errorbar(width = 0.03) +
+    scale_color_manual(values = colorspace::qualitative_hcl(length(unique(tbl_auc$Method)), palette = "Dark 3")) +
+    scale_shape_manual(values = seq_along(tbl_auc$Method)) +
+    theme_light(base_size = 25) +
+    # facet_grid(. ~ mask, labeller = label_both) +
+    theme(legend.position = "right", legend.direction = "vertical") +
+    labs(y = "AUC", x = "p") +
+    ylim(c(0.2,1)) +
+    scale_x_log10(breaks = c(25, 50, 100, 500, 1000, 5000, 10000, 19000))
+```
+
+
+```{r plot_avg_roc_rows, include=TRUE, echo=FALSE, fig.width=10, fig.height=10}
+plot_average_roc(tbl, 100, 'rows')
+```
+
+&nbsp;
+
+### Timings
+
+```{r plot_timings, include=TRUE, echo=FALSE, fig.width=10, fig.height=10}
+tbl_time =
+    tbl %>%
+    filter(method != 'glasso', mask == 'rows') %>%
+    group_by(p, method) %>%
+    summarise(avg_auc = mean(auc, na.rm = TRUE),
+              stderr_auc = sd(auc, na.rm = TRUE) / sqrt(n_rep),
+              avg_time = mean(time, na.rm = TRUE),
+              stderr_time = sd(time, na.rm = TRUE) / sqrt(n_rep)) %>%
+    cad_name_mapping()
+
+ggplot(tbl_time, 
+       aes(x = p,
+           y = 1 + avg_time,
+           ymin = 1 + (avg_time - stderr_time),
+           ymax = 1 + (avg_time + stderr_time),
+           color = Method,
+           shape = Method)) +
+    geom_line() +
+    geom_point(size = 3) +
+    geom_errorbar(width = 0.03) +
+    scale_color_manual(values = 
+                           colorspace::qualitative_hcl(length(unique(tbl_time$Method)), palette = "Dark 3")) +
+    scale_shape_manual(values = seq_along(tbl_time$Method)) +
+    theme_light(base_size = 25) +
+    # facet_grid(. ~ mask, labeller = as_labeller(c('entries' = 'entry-wise', 'rows' = 'row-wise'))) +
+    theme(legend.position = "right", legend.direction = "vertical") +
+    labs(y = "Wall clock time (s)", x = "p") +
+    scale_x_log10(breaks = c(25, 50, 100, 500, 1000, 5000, 10000, 19000)) +
+    scale_y_log10()
+```
+
