@@ -24,13 +24,13 @@ cad_process_data_gies = function(obs_data, int_data, int_indices, G_star,
     ### Select subset of interventions to create the graph
     
     int_perm_ids   = sample.int(int_total_count)
-    int_graph_ids  = int_perm_ids[1:int_graph_count]
+    int_graph_ids  = int_perm_ids[1:int_graph_count] # Here, sample int_graph_count out of the 71 interventional data points 
 
     obs_sample_ids = sample.int(obs_total_count, size = obs_sample_count)
     
     ### Subset true graph
     
-    G_star = G_star[int_graph_ids, , drop=FALSE]
+    G_star = G_star[int_graph_ids, , drop=FALSE] 
     
     ### Create matrix X of training data
     
@@ -51,7 +51,7 @@ cad_process_data_gies = function(obs_data, int_data, int_indices, G_star,
     if (remove_near_constant_columns) {
         jj = union(1:int_graph_count,
                    which(colSums(G_star) < (int_graph_count / 2)))
-        G_star  = G_star[ ,jj,drop=FALSE]
+        G_star  = G_star[ ,jj,drop=FALSE] 
         X  = X[ , jj, drop=FALSE]
     }
     
@@ -72,4 +72,3 @@ cad_process_data_gies = function(obs_data, int_data, int_indices, G_star,
     
     return(data)
 }
-

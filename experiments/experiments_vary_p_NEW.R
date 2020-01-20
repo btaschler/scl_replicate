@@ -4,13 +4,32 @@
 
 #rm(list = ls())
 
-# library(tidyverse)
-# library(biglasso)
+library(tidyverse)
+library(biglasso)
 # library(cad)
-# library(pcalg)
-# library(huge)
-# library(corpcor)
-# library(filehash)
+library(pcalg)
+library(huge)
+library(corpcor)
+library(filehash)
+
+
+# CHD:
+library(parallel)
+library(doParallel)
+library(itertools)
+library(rsvd)
+
+for(f in list.files(file.path(getwd(), "R") )){
+    source(file.path(getwd(), "R", f))
+}
+for(f in list.files(file.path(getwd(), "experiments", "methods") )){
+    source(file.path(getwd(), "experiments", "methods", f))
+}
+source( file.path(getwd(), "experiments", "functions", "run_experiment.R") )
+require(R.utils)
+fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds') 
+data_list <- readRDS(fid_data)
+# 
 
 ### Load functions
 
@@ -49,7 +68,7 @@ percentage_visible = 50
 mask_seq = c("rows", "entries")
 
 # Repetitions
-rep_seq = 1:3 #10                                                                ## TESTING
+rep_seq = 1:10                                                                ## TESTING
 
 # Methods
 
@@ -86,7 +105,7 @@ for (p in p_seq) {
                                 int_sample_count = int_sample_count,
                                 obs_sample_count = obs_sample_count,
                                 remove_near_constant_columns = remove_near_constant_columns)
-
+        
         # Mask entries
         G0_entries = mask_graph(data$G_star, percentage_visible = percentage_visible, mask = "entries")
         G0_rows    = mask_graph(data$G_star, percentage_visible = percentage_visible, mask = "rows")

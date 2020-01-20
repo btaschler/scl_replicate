@@ -35,7 +35,8 @@ run_gies <- function(X, G0) {
                  target.index = target.index,
                  nodes = colnames(X))
     
-    gies.fit <- pcalg::gies(score, maxDegree = 5L)
+    # gies.fit <- pcalg::gies(score, maxDegree = 5L)
+    gies.fit <- pcalg::gies(score) #CHD
     
     ###########################################################################
     

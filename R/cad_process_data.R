@@ -26,7 +26,7 @@ cad_process_data = function(obs_data, int_data, int_indices, G_star,
     
     int_perm_ids   = sample.int(int_total_count)
     int_graph_ids  = int_perm_ids[1:int_graph_count]
-    int_sample_ids = int_perm_ids[(int_graph_count+1):(int_graph_count+int_sample_count)]
+    int_sample_ids = int_perm_ids[(int_graph_count+1):(int_graph_count+int_sample_count)] # rest of interventional points
     
     obs_sample_ids = sample.int(obs_total_count, size = obs_sample_count)
     
@@ -37,7 +37,7 @@ cad_process_data = function(obs_data, int_data, int_indices, G_star,
     ### Create matrix X of training data
     
     X = rbind(obs_data[obs_sample_ids, , drop=FALSE],
-              int_data[int_sample_ids, , drop=FALSE])
+              int_data[int_sample_ids, , drop=FALSE]) # add rest of interventional data points to X mat
     
     ### Rearrange genes (columns) with int_indices first to allow for diagonal checking
     
