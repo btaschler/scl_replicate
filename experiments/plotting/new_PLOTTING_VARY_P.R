@@ -6,14 +6,31 @@
 # rm(list = ls())
 # 
 # library(cad)
-# library(tidyverse)
-# library(filehash)
-# library(colorspace)
-# library(MLmetrics)
-# library(ROCR)
-# library(R.devices)
+library(tidyverse)
+library(filehash)
+library(colorspace)
+library(MLmetrics)
+library(ROCR)
+library(R.devices)
 
-#source('experiments/plotting/plottingFunctions.R')
+source('experiments/plotting/plottingFunctions.R')
+
+
+# CHD:
+for(f in list.files(file.path(getwd(), "R") )){
+    source(file.path(getwd(), "R", f))
+}
+for(f in list.files(file.path(getwd(), "experiments", "methods") )){
+    source(file.path(getwd(), "experiments", "methods", f))
+}
+source( file.path(getwd(), "experiments", "functions", "run_experiment.R") )
+require(R.utils)
+fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds') 
+data_list <- readRDS(fid_data)
+
+res_dir <- getwd() 
+# 
+
 
 
 dict_auc_obj = list(method_cad_lasso = "g_hat",
@@ -33,7 +50,7 @@ dict_auc_obj = list(method_cad_lasso = "g_hat",
 
 
 #db_res_path = file.path("C:/Users/user-adm/Documents/cad_results/vary_p")
-db_res_path = file.path(getwd(), "results", "vary_p")
+db_res_path = file.path(res_dir, "results", "vary_p")
 db_res = dbInit(db_res_path, type = "RDS")
 
 names = dbList(db_res)
