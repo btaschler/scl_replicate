@@ -29,6 +29,8 @@ source( file.path(getwd(), "experiments", "functions", "run_experiment.R") )
 require(R.utils)
 fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds') 
 data_list <- readRDS(fid_data)
+
+res_dir <- getwd() 
 # 
 
 ### Load functions
@@ -141,7 +143,7 @@ for (p in p_seq) {
 
 set.seed(0)
 
-db_res_path = file.path(getwd(), "results", "vary_p")
+db_res_path = file.path(res_dir, "results", "vary_p")
 if(!dir.exists(db_res_path)){ dbCreate(db_res_path, type = "RDS") }
 db_res = dbInit(db_res_path, type = "RDS")
 
@@ -175,8 +177,8 @@ for (p in p_seq) {
                     next
                 } else {
                     
-                    db_res_name = sprintf('p_%s__rep_%s__mask_%s__%s',
-                                          p,    k,      mask,    method)
+                    db_res_name = sprintf('p_%s__vis_%s__rep_%s__mask_%s__%s',
+                                          p, percentage_visible, k, mask, method)
                     
                     res_tmp = run_experiment(X, G0, G_star, method, db_res, db_res_name, 
                                              # Data
