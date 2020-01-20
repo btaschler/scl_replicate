@@ -1,4 +1,4 @@
-method_ida = function(X, G0, skel.method = 'stable.fast') {
+method_ida = function(X, G0, skel.method = 'stable') {
     
     X = scale(X)
     stopifnot( !anyNA(X) )

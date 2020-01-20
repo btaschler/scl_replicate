@@ -1,4 +1,4 @@
-method_pc_05 = function(X, G0, sig_level = 0.5, skel.method = 'stable.fast') {
+method_pc_05 = function(X, G0, sig_level = 0.5, skel.method = 'stable') {
     
     X = scale(X)
     stopifnot( !anyNA(X) )
