@@ -29,8 +29,11 @@ fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds')
 data_list <- readRDS(fid_data)
 
 res_dir <- getwd() 
+plot_dir <-  file.path(getwd(), "plots")
+if(!dir.exists(plot_dir)){
+    dir.create(plot_dir)
+}
 # 
-
 
 
 dict_auc_obj = list(method_cad_lasso = "g_hat",
@@ -117,7 +120,7 @@ width = 14
 height = 10
 
 
-#eps('Z:/PAPERS/CAD/Figures/vary_p__entries__panel_1.eps', width, height)
+eps(file.path(plot_dir, 'vary_p__entries__panel_1.eps'), width, height)
 ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'entries'), 
        aes(x = p,
            y = avg_auc,
@@ -136,21 +139,21 @@ ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'entries'),
     labs(y = "AUC", x = "p") +
     ylim(c(0.2,1)) +
     scale_x_log10(breaks = c(25, 50, 100, 500, 1000, 5000, 10000, 19000))
-#dev.off()
+dev.off()
 
 
 width = 10
 height = 10
 
-#ps('Z:/PAPERS/CAD/Figures/vary_p__entries__panel_2.eps', width, height)
+ps(file.path(plot_dir, 'vary_p__entries__panel_2.eps'), width, height)
 plot_average_roc(tbl, 100, 'entries')
-#dev.off()
+dev.off()
 
-#eps('Z:/PAPERS/CAD/Figures/vary_p__entries__panel_3.eps', width, height)
-plot_average_roc(tbl, 1000, 'entries')
-#dev.off()
+# eps(file.path(plot_dir, 'vary_p__entries__panel_3.eps'), width, height)
+# plot_average_roc(tbl, 1000, 'entries')
+# dev.off()
 
-#eps('Z:/PAPERS/CAD/Figures/vary_p__entries__panel_4.eps', width, height)
+# eps(file.path(plot_dir, 'vary_p__entries__panel_4.eps'), width, height)
 #plot_average_roc(tbl, 19000, 'entries')
 #dev.off()
 
@@ -160,7 +163,7 @@ plot_average_roc(tbl, 1000, 'entries')
 width = 14
 height = 10
 
-#eps('Z:/PAPERS/CAD/Figures/vary_p__rows__panel_1.eps', width, height)
+eps(file.path(plot_dir, 'vary_p__rows__panel_1.eps'), width, height)
 ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'rows'), 
        aes(x = p,
            y = avg_auc,
@@ -179,21 +182,21 @@ ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'rows'),
     labs(y = "AUC", x = "p") +
     ylim(c(0.2,1)) +
     scale_x_log10(breaks = c(25, 50, 100, 500, 1000, 5000, 10000, 19000))
-#dev.off()
+dev.off()
 
 
 width = 10
 height = 10
 
-#eps('Z:/PAPERS/CAD/Figures/vary_p__rows__panel_2.eps', width, height)
+eps(file.path(plot_dir, 'vary_p__rows__panel_2.eps'), width, height)
 plot_average_roc(tbl, 100, 'rows')
-#dev.off()
+dev.off()
 
-#eps('Z:/PAPERS/CAD/Figures/vary_p__rows__panel_3.eps', width, height)
-plot_average_roc(tbl, 1000, 'rows')
-#dev.off()
+# eps(file.path(plot_dir, 'vary_p__rows__panel_3.eps'), width, height)
+# plot_average_roc(tbl, 1000, 'rows')
+# dev.off()
 
-#eps('Z:/PAPERS/CAD/Figures/vary_p__rows__panel_4.eps', width, height)
+# eps(file.path(plot_dir, 'vary_p__rows__panel_4.eps'), width, height)
 #plot_average_roc(tbl, 19000, 'rows')
 #dev.off()
 
@@ -205,37 +208,37 @@ width = 7
 height = 10
 
 
-#eps('Z:/PAPERS/CAD/Figures/vary_p__time.eps', width * 2, height)
+#eps(file.path(plot_dir, 'vary_p__time.eps'), width * 2, height)
 
-tbl_time =
-    tbl %>%
-    filter(method != 'glasso', mask == 'rows') %>%
-    group_by(p, method) %>%
-    summarise(avg_auc = mean(auc, na.rm = TRUE),
-              stderr_auc = sd(auc, na.rm = TRUE) / sqrt(n_rep),
-              avg_time = mean(time, na.rm = TRUE),
-              stderr_time = sd(time, na.rm = TRUE) / sqrt(n_rep)) %>%
-    cad_name_mapping()
-
-ggplot(tbl_time, 
-       aes(x = p,
-           y = 1 + avg_time,
-           ymin = 1 + (avg_time - stderr_time),
-           ymax = 1 + (avg_time + stderr_time),
-           color = Method,
-           shape = Method)) +
-    geom_line() +
-    geom_point(size = 3) +
-    geom_errorbar(width = 0.03) +
-    scale_color_manual(values = 
-                           colorspace::qualitative_hcl(length(unique(tbl_time$Method)), palette = "Dark 3")) +
-    scale_shape_manual(values = seq_along(tbl_time$Method)) +
-    theme_light(base_size = 25) +
-    # facet_grid(. ~ mask, labeller = as_labeller(c('entries' = 'entry-wise', 'rows' = 'row-wise'))) +
-    theme(legend.position = "right", legend.direction = "vertical") +
-    labs(y = "Wall clock time (s)", x = "p") +
-    scale_x_log10(breaks = c(25, 50, 100, 500, 1000, 5000, 10000, 19000)) +
-    scale_y_log10()
+# tbl_time =
+#     tbl %>%
+#     filter(method != 'glasso', mask == 'rows') %>%
+#     group_by(p, method) %>%
+#     summarise(avg_auc = mean(auc, na.rm = TRUE),
+#               stderr_auc = sd(auc, na.rm = TRUE) / sqrt(n_rep),
+#               avg_time = mean(time, na.rm = TRUE),
+#               stderr_time = sd(time, na.rm = TRUE) / sqrt(n_rep)) %>%
+#     cad_name_mapping()
+# 
+# ggplot(tbl_time, 
+#        aes(x = p,
+#            y = 1 + avg_time,
+#            ymin = 1 + (avg_time - stderr_time),
+#            ymax = 1 + (avg_time + stderr_time),
+#            color = Method,
+#            shape = Method)) +
+#     geom_line() +
+#     geom_point(size = 3) +
+#     geom_errorbar(width = 0.03) +
+#     scale_color_manual(values = 
+#                            colorspace::qualitative_hcl(length(unique(tbl_time$Method)), palette = "Dark 3")) +
+#     scale_shape_manual(values = seq_along(tbl_time$Method)) +
+#     theme_light(base_size = 25) +
+#     # facet_grid(. ~ mask, labeller = as_labeller(c('entries' = 'entry-wise', 'rows' = 'row-wise'))) +
+#     theme(legend.position = "right", legend.direction = "vertical") +
+#     labs(y = "Wall clock time (s)", x = "p") +
+#     scale_x_log10(breaks = c(25, 50, 100, 500, 1000, 5000, 10000, 19000)) +
+#     scale_y_log10()
 
 #dev.off()
 
