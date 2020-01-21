@@ -24,6 +24,14 @@ is_method_binary = function(method) {
     ifelse(method %in% get_binary_methods(), TRUE, FALSE)
 }
 
+glmnet_auc = function(y, prob){
+    rprob = rank(prob)
+    n1 = sum(y)
+    n0 = length(y) - n1
+    u = sum(rprob[y == 1]) - n1 * (n1 + 1)/2
+    exp(log(u) - log(n1) - log(n0))
+}
+
 
 #' @export
 get_auc = function(G_star, G0, G_hat, method, id_swap = NULL) {
@@ -59,7 +67,7 @@ get_auc = function(G_star, G0, G_hat, method, id_swap = NULL) {
         fpr = NA
     }
     
-    auc_score = glmnet::auc(y_true, y_pred)
+    auc_score = glmnet_auc(y_true, y_pred)
     
     return(
         list(auc = auc_score, tpr = tpr, fpr = fpr, 
