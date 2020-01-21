@@ -31,6 +31,7 @@ fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds')
 data_list <- readRDS(fid_data)
 
 res_dir <- getwd() 
+data_dir <- getwd()
 # 
 
 ### Load functions
@@ -85,7 +86,7 @@ method_seq = names(method_p_list)
 
 ### Generate datasets -------------------------------------------------------
 
-db_vary_p_path = file.path(getwd(), "data", "vary_p")
+db_vary_p_path = file.path(data_dir, "data", "vary_p")
 if(!dir.exists(db_vary_p_path)){ dbCreate(db_vary_p_path, type = "RDS") }
 
 db_vary_p = filehash::dbInit(db_vary_p_path, type = "RDS")

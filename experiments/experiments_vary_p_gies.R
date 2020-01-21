@@ -30,6 +30,7 @@ fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds')
 data_list <- readRDS(fid_data)
 
 res_dir <- getwd() 
+data_dir <- getwd()
 # 
 
 
@@ -66,7 +67,7 @@ percentage_visible = 50
 mask_seq = c("rows")
 
 # Repetitions
-rep_seq = 1:10 #10                                                                ## TESTING
+rep_seq = 1:10                                                                ## TESTING
 
 # Methods
 
@@ -79,7 +80,7 @@ method_seq = names(method_p_list)
 
 # Generate datasets -------------------------------------------------------
 
-db_vary_p_gies_path = file.path(getwd(), "data", "vary_p_gies")
+db_vary_p_gies_path = file.path(data_dir, "data", "vary_p_gies")
 if(!dir.exists(db_vary_p_gies_path)){ dbCreate(db_vary_p_gies_path, type = "RDS") }
 db_vary_p_gies = dbInit(db_vary_p_gies_path, type = "RDS")
 

@@ -30,6 +30,7 @@ fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds')
 data_list <- readRDS(fid_data)
 
 res_dir <- getwd() 
+data_dir <- getwd()
 # 
 
 # Reproducibility
@@ -77,18 +78,19 @@ p_seq = c(50, 100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)      
 method_p_list = list(#"method_shrinkage"    = p_seq,                             ## REDUCE NUMBER OF METHODS RUN
                      "method_cor_pearson"  = p_seq,
                      #"method_cor_spearman" = p_seq,
-                     #"method_cor_kendall"  = p_seq[p_seq <= 1000],
+                     "method_cor_kendall"  = p_seq[p_seq <= 1000],
                      "method_ida"          = p_seq[p_seq <= 1000],
-                     #"method_rfci"         = p_seq[p_seq <= 1000],
-                     #"method_glasso"       = p_seq[p_seq <= 1000],
-                     "method_pc"           = p_seq[p_seq <= 1000])
+                     "method_rfci"         = p_seq[p_seq <= 1000],
+                     "method_glasso"       = p_seq[p_seq <= 1000],
+                     "method_pc"           = p_seq[p_seq <= 1000],
+                     "method_pc_05"           = p_seq[p_seq <= 1000])
 
 method_seq = names(method_p_list)
 
 
 # Generate datasets -------------------------------------------------------
 
-db_vary_p_path = file.path(getwd(), "data", "vary_p")
+db_vary_p_path = file.path(data_dir, "data", "vary_p")
 if(!dir.exists(db_vary_p_path)){ dbCreate(db_vary_p_path, type = "RDS") }
 db_vary_p = dbInit(db_vary_p_path, type = "RDS")
 
