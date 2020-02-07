@@ -29,8 +29,8 @@ require(R.utils)
 fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds') 
 data_list <- readRDS(fid_data)
 
-res_dir <- getwd() 
-data_dir <- getwd()
+res_dir <- "/cluster/work/math/heinzec/scl/"
+data_dir <- "/cluster/work/math/heinzec/scl/"
 # 
 
 
