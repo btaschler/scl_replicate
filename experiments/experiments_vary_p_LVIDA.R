@@ -28,8 +28,8 @@ require(R.utils)
 fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds') 
 data_list <- readRDS(fid_data)
 
-res_dir <- getwd() 
-data_dir <- getwd()
+res_dir <- "/cluster/work/math/heinzec/scl/"
+data_dir <- "/cluster/work/math/heinzec/scl/"
 # 
 
 # Reproducibility
@@ -65,11 +65,11 @@ percentage_visible = 50
 mask_seq = c("rows", "entries")
 
 # Repetitions
-rep_seq = 1#:10                                                                ## TESTING
+rep_seq = 1:10                                                                ## TESTING
 
 # Methods
 
-p_seq = c(25)#, 50, 100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)        ## TESTING
+p_seq = c(25, 50, 100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)        ## TESTING
 
 method_p_list = list("method_lvida_05" = p_seq[p_seq <= 1000])
 

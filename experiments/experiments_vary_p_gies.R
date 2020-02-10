@@ -67,7 +67,7 @@ percentage_visible = 50
 mask_seq = c("rows")
 
 # Repetitions
-rep_seq = 1                                                               ## TESTING
+rep_seq = 1:10                                                               ## TESTING
 
 # Methods
 
