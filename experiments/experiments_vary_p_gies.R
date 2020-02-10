@@ -4,6 +4,18 @@
 
 #rm(list = ls())
 
+args <- commandArgs(TRUE)
+if(length(args) == 0){
+    p_ <- 25
+    p_seq = c(p_)
+}else{
+    print(args)
+    numberOfArgs <- length(args)
+    p_ <- sub("-","",args[numberOfArgs])
+    p_seq <- c(as.numeric(p_))
+}
+cat(paste("Running for p=", p_, "\n"))
+
 library(tidyverse)
 library(biglasso)
 # library(cad)
@@ -71,7 +83,7 @@ rep_seq = 1:10                                                               ## 
 
 # Methods
 
-p_seq = c(25, 50, 100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)       ## TESTING
+# p_seq = c(25, 50, 100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)       ## TESTING
 
 method_p_list = list("method_gies" = p_seq[p_seq <= 1000])
 

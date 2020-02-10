@@ -7,14 +7,15 @@
 
 args <- commandArgs(TRUE)
 if(length(args) == 0){
-    p_seq = c(25)
+    p_ <- 25
+    p_seq = c(p_)
 }else{
     print(args)
     numberOfArgs <- length(args)
-    p <- sub("-","",args[numberOfArgs])
-    p_seq <- c(p)
+    p_ <- sub("-","",args[numberOfArgs])
+    p_seq <- c(as.numeric(p_))
 }
-cat(paste("Running for p=", p, "\n"))
+cat(paste("Running for p=", p_, "\n"))
 
 library(tidyverse)
 library(biglasso)
@@ -81,7 +82,7 @@ rep_seq = 1:10                                                                ##
 
 # Methods
 
-# p_seq = c(25, 50, 100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)        ## TESTING
+# p_seq = c(200) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)        ## TESTING
 
 method_p_list = list("method_lvida_05" = p_seq[p_seq <= 1000])
 
@@ -100,7 +101,7 @@ db_vary_p = dbInit(db_vary_p_path, type = "RDS")
 set.seed(0)
 
 db_res_path = file.path(res_dir, "results", "vary_p")
-#dbCreate(db_res_path, type = "RDS")
+if(!dir.exists(db_res_path)){ dbCreate(db_res_path, type = "RDS") }
 db_res = dbInit(db_res_path, type = "RDS")
 
 for (p in p_seq) {
