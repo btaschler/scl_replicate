@@ -30,8 +30,8 @@ require(R.utils)
 fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds') 
 data_list <- readRDS(fid_data)
 
-res_dir <- getwd() 
-data_dir <- getwd()
+res_dir <- "/cluster/work/math/heinzec/scl/"
+data_dir <- "/cluster/work/math/heinzec/scl/"
 # 
 
 ### Load functions
@@ -75,7 +75,7 @@ rep_seq = 1:10                                                                ##
 
 # Methods
 
-p_seq = c(50, 100) #c(25, 50, 100, 200, 500, 1000)                               ## TESTING
+p_seq = c(25, 50, 100) #c(25, 50, 100, 200, 500, 1000)                               ## TESTING
 
 # method_p_list = list("method_cad_lasso" = p_seq,
 #                      "method_cad_keras" = p_seq)

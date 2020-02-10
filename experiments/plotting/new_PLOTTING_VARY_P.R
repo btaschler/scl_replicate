@@ -13,7 +13,7 @@ library(MLmetrics)
 library(ROCR)
 library(R.devices)
 
-source('experiments/plotting/plottingFunctions.R')
+source(file.path(getwd(), 'experiments/plotting/plottingFunctions.R'))
 
 
 # CHD:
@@ -28,8 +28,8 @@ require(R.utils)
 fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds') 
 data_list <- readRDS(fid_data)
 
-res_dir <- getwd() 
-plot_dir <-  file.path(getwd(), "plots")
+res_dir <- "/cluster/work/math/heinzec/scl"
+plot_dir <-  file.path("/cluster/work/math/heinzec/scl", "plots")
 if(!dir.exists(plot_dir)){
     dir.create(plot_dir)
 }
@@ -145,7 +145,7 @@ dev.off()
 width = 10
 height = 10
 
-ps(file.path(plot_dir, 'vary_p__entries__panel_2.eps'), width, height)
+eps(file.path(plot_dir, 'vary_p__entries__panel_2.eps'), width, height)
 plot_average_roc(tbl, 100, 'entries')
 dev.off()
 

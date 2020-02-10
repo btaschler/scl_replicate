@@ -53,8 +53,8 @@ plot_average_roc = function(data, p, mask) {
         y_pred = real_data$data[[i]]$y_pred
         y_true = real_data$data[[i]]$y_true
         
-        if (max(unlist(y_pred)) >= 2) stop('>=2')
-        if (min(unlist(y_pred)) < 0) stop('<0')
+        # if (max(unlist(y_pred)) >= 2) stop('>=2')
+        # if (min(unlist(y_pred)) < 0) stop('<0')
         
         pred_obj = prediction(y_pred, y_true)
         perf_obj = performance(pred_obj, "tpr", "fpr")
