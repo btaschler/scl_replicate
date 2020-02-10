@@ -67,11 +67,11 @@ percentage_visible = 50
 mask_seq = c("rows")
 
 # Repetitions
-rep_seq = 1:10                                                                ## TESTING
+rep_seq = 1                                                               ## TESTING
 
 # Methods
 
-p_seq = c(50, 100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)       ## TESTING
+p_seq = c(100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)       ## TESTING
 
 method_p_list = list("method_gies" = p_seq[p_seq <= 1000])
 

@@ -4,17 +4,33 @@
 
 # rm(list = ls())
 # 
-# library(tidyverse)
-# library(biglasso)
+library(tidyverse)
+library(biglasso)
 # library(cad)
-# library(pcalg)
-# library(huge)
-# library(corpcor)
-# library(filehash)
+library(pcalg)
+library(huge)
+library(corpcor)
+library(filehash)
 
 # Load functions
 
 #source( file.path(getwd(), "experiments", "experiments_add_path.R") )
+
+# CHD:
+for(f in list.files(file.path(getwd(), "R") )){
+    source(file.path(getwd(), "R", f))
+}
+for(f in list.files(file.path(getwd(), "experiments", "methods") )){
+    source(file.path(getwd(), "experiments", "methods", f))
+}
+source( file.path(getwd(), "experiments", "functions", "run_experiment.R") )
+require(R.utils)
+fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds') 
+data_list <- readRDS(fid_data)
+
+res_dir <- getwd() 
+data_dir <- getwd()
+# 
 
 # Reproducibility
 
@@ -49,11 +65,11 @@ percentage_visible = 50
 mask_seq = c("rows", "entries")
 
 # Repetitions
-rep_seq = 1:3 #10                                                                ## TESTING
+rep_seq = 1#:10                                                                ## TESTING
 
 # Methods
 
-p_seq = c(50,100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)        ## TESTING
+p_seq = c(25)#, 50, 100) #c(25, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Inf)        ## TESTING
 
 method_p_list = list("method_lvida_05" = p_seq[p_seq <= 1000])
 
@@ -62,7 +78,7 @@ method_seq = names(method_p_list)
 
 # Generate datasets -------------------------------------------------------
 
-db_vary_p_path = file.path(getwd(), "data", "vary_p")
+db_vary_p_path = file.path(data_dir, "data", "vary_p")
 db_vary_p = dbInit(db_vary_p_path, type = "RDS")
 
 
@@ -71,7 +87,7 @@ db_vary_p = dbInit(db_vary_p_path, type = "RDS")
 
 set.seed(0)
 
-db_res_path = file.path(getwd(), "results", "vary_p")
+db_res_path = file.path(res_dir, "results", "vary_p")
 #dbCreate(db_res_path, type = "RDS")
 db_res = dbInit(db_res_path, type = "RDS")
 
@@ -105,8 +121,8 @@ for (p in p_seq) {
                     next
                 } else {
                     
-                    db_res_name = sprintf('p_%s__rep_%s__mask_%s__%s',
-                                          p,    k,      mask,    method)
+                    db_res_name = sprintf('p_%s__vis_%s__rep_%s__mask_%s__%s',
+                                          p, percentage_visible, k, mask, method)
                     
                     run_experiment(X, G0, G_star, method, db_res, db_res_name, 
                                    # Data
