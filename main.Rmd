@@ -3,13 +3,13 @@ title: "SCL/CAD replication"
 author: "BT"
 date: '`r format(Sys.Date())`'
 output:
-  pdf_document:
-    toc: yes
   html_document:
     keep_md: yes
     theme: united
     toc: yes
     toc_float: yes
+  pdf_document:
+    toc: yes
 params:
   tmp: 0
 ---
@@ -79,7 +79,7 @@ The data structure `data_list` contains all available data points as extracted f
 
 **Requirement**: File `shrna_processed_data.rds` needs to be stored in the "data" folder inside the working directory.
 
-```{r load_data, include=TRUE, cache=TRUE, message=FALSE}
+```{r load_data, eval = FALSE, cache=TRUE, message=FALSE}
 #cat('\n load preprocessed shRNA-seq data ... \n') 
 fid_data <- filePath(getwd(), 'data', 'shrna_processed_data.rds')
 data_list <- readRDS(fid_data)
@@ -92,7 +92,7 @@ data_list <- readRDS(fid_data)
 
 ## Experiment - varying p
 
-```{r setup_output, include=TRUE}
+```{r setup_output, eval = FALSE}
 if(!dir.exists('results')){ dir.create('results') }
 ```
 
@@ -109,7 +109,7 @@ Individual results (for each method, setting and repetition) are stored as separ
 &nbsp;
 
 ### Running the original CAD/SCL code
-```{r cad_vary_p, include=TRUE, cache=TRUE, message=FALSE, dependson='load_data'}
+```{r cad_vary_p, eval = FALSE, cache=TRUE, message=FALSE, dependson='load_data'}
 #source('experiments/experiments_vary_p_NEW.R')
 ```
 
@@ -117,7 +117,7 @@ Individual results (for each method, setting and repetition) are stored as separ
 
 
 ### Running the original GIES code
-```{r gies_vary_p, include=TRUE, cache=TRUE, message=FALSE, dependson='load_data'}
+```{r gies_vary_p, eval = FALSE, cache=TRUE, message=FALSE, dependson='load_data'}
 source('experiments/experiments_vary_p_gies.R')
 ```
 
@@ -128,7 +128,7 @@ Please modify the function in `run_gies.R` (located in the "R" subfolder in the 
 
 
 ### Running the original IDA and PC code
-```{r rfci_pc_vary_p, include=TRUE, cache=TRUE, message=FALSE, dependson='load_data'}
+```{r rfci_pc_vary_p, eval = FALSE, cache=TRUE, message=FALSE, dependson='load_data'}
 source('experiments/experiments_vary_p_LITERATURE.R')
 ```
 
@@ -139,7 +139,7 @@ Please modify the functions `run_ida.R` and `run_pc.R`, respectively (located in
 
 
 ### Running the original LV-IDA/RFCI code
-```{r ida_vary_p, include=TRUE, cache=TRUE, message=FALSE}
+```{r ida_vary_p, eval = FALSE, cache=TRUE, message=FALSE}
 source('experiments/experiments_vary_p_LVIDA.R')
 ```
 
@@ -153,11 +153,11 @@ Please modify the function in `run_lvida.R` (located in the "R" subfolder in the
 
 ## Results
 
-Below are shown some example results for the test settings. 
+Below are shown some example results for varying p up to 100. 
 
 **Note**: These function calls should also work for any other preliminary, partial or full results. All the files in the "results" folder are automatically taken into account when generating the figures. 
 
-```{r setup_plotting, include=FALSE, cache=FALSE}
+```{r setup_plotting, eval=TRUE,, echo=TRUE, cache=FALSE}
 source('experiments/plotting/plottingFunctions.R')
 
 ## The following bits of code are based on the file 'experiments/plotting/new_PLOTTING_VARY_P.R'.
@@ -178,23 +178,27 @@ dict_auc_obj = list(method_cad_lasso = "g_hat",
                     method_lvida_05 = "g_hat")
 
 
-db_res_path = file.path(getwd(), "results", "vary_p")
+#db_res_path = file.path(getwd(), "results", "vary_p")                          #(A) human
+db_res_path = file.path(getwd(), "results", "yeast", "results", "vary_p")       #(B) yeast
 db_res = dbInit(db_res_path, type = "RDS")
 
 names = dbList(db_res)
-n = length(names)
+#n = length(names)
 
 tbl = tibble(
-    p = NA, 
-    rep = NA, 
-    mask = NA, 
-    method = NA, 
-    time = NA
+    p = numeric(), 
+    rep = numeric(), 
+    mask = character(), 
+    method = character(), 
+    time = numeric(),
+    auc = numeric(),
+    tpr = numeric(),
+    fpr = numeric()
 )
 
-shared_variables = names(tbl)
+shared_variables = names(tbl)[1:5]
 
-for (i in 1:n) {
+for (i in 1:length(names)) {
     res = db_res[[ names[i] ]]
     
     for (n in shared_variables) {
@@ -243,7 +247,7 @@ tbl_auc =
 
 ### Entry-wise masking
 
-```{r plot_auc_entries, include=TRUE, echo=FALSE, fig.width=12, fig.height=10}
+```{r plot_auc_entries, eval=TRUE, echo=FALSE, fig.width=12, fig.height=10}
 ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'entries'), 
        aes(x = p,
            y = avg_auc,
@@ -264,7 +268,7 @@ ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'entries'),
     scale_x_log10(breaks = c(25, 50, 100, 500, 1000, 5000, 10000, 19000))
 ```
 
-```{r plot_avg_roc_entries, include=TRUE, echo=FALSE, fig.width=10, fig.height=10}
+```{r plot_avg_roc_entries, eval=TRUE, echo=TRUE, fig.width=10, fig.height=10}
 plot_average_roc(tbl, 100, 'entries')
 ```
 
@@ -272,7 +276,7 @@ plot_average_roc(tbl, 100, 'entries')
 
 ### Row-wise masking
 
-```{r plot_auc_rows, include=TRUE, echo=FALSE, fig.width=12, fig.height=10}
+```{r plot_auc_rows, eval=TRUE, echo=FALSE, fig.width=12, fig.height=10}
 ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'rows'), 
        aes(x = p,
            y = avg_auc,
@@ -294,7 +298,7 @@ ggplot(filter(tbl_auc, !(method %in% get_binary_methods()), mask == 'rows'),
 ```
 
 
-```{r plot_avg_roc_rows, include=TRUE, echo=FALSE, fig.width=10, fig.height=10}
+```{r plot_avg_roc_rows, eval=TRUE, echo=FALSE, fig.width=10, fig.height=10}
 plot_average_roc(tbl, 100, 'rows')
 ```
 
@@ -302,7 +306,7 @@ plot_average_roc(tbl, 100, 'rows')
 
 ### Timings
 
-```{r plot_timings, include=TRUE, echo=FALSE, fig.width=10, fig.height=10}
+```{r plot_timings, eval=TRUE, echo=FALSE, fig.width=10, fig.height=10}
 tbl_time =
     tbl %>%
     filter(method != 'glasso', mask == 'rows') %>%
